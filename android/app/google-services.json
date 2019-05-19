@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "966383523136",
+    "firebase_url": "https://bilio-a7c82.firebaseio.com",
+    "project_id": "bilio-a7c82",
+    "storage_bucket": "bilio-a7c82.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966383523136:android:18b5e58abeafcf1f",
+        "android_client_info": {
+          "package_name": "com.example.flutter_course"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "966383523136-k36gj4eh4q0vp8a3aa7mve94mhp6ptqf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_course",
+            "certificate_hash": "c1678c432748774d7ba8dd040b4e485e5f713fef"
+          }
+        },
+        {
+          "client_id": "966383523136-nrp96l8askdd5r4rlcld1nvehe04qt5l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN5D0qPbvAFHIu0QsgPSzM5j7XTd4mg-s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "966383523136-nrp96l8askdd5r4rlcld1nvehe04qt5l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
