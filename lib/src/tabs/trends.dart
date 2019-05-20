@@ -9,186 +9,240 @@ class Trends extends StatefulWidget {
 
 class _TrendsState extends State<Trends> {
   RegExp exp = new RegExp(r"(^|\s)#(\w+)");
-final MainService service = new MainService();
+  MainService service;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  @override
+  void initState() {
+    service = new MainService();
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: StreamBuilder<QuerySnapshot>(
-    stream: Firestore.instance.collection('post').orderBy('postedOn',descending: true).snapshots(),
-    builder: (BuildContext context,
-    AsyncSnapshot<QuerySnapshot> snapshot) {
+        child: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance.collection('post').orderBy(
+              'postedOn', descending: true).snapshots(),
+          builder: (BuildContext context,
+              AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) return new Text('${snapshot.error}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return new Center(child: new CircularProgressIndicator());
+              default:
+                return new Center(
+                    child: new ListView(
+                        children: snapshot.data.documents
+                            .map((DocumentSnapshot document) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    16.0, 16.0, 8.0, 16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceBetween,
+                                  children: <Widget>[
 
-      if (snapshot.hasError) return new Text('${snapshot.error}');
-      switch (snapshot.connectionState) {
-        case ConnectionState.waiting:
-          return new Center(child: new CircularProgressIndicator());
-        default:
-          return new Center(
-            child: new ListView(
-          children: snapshot.data.documents
-              .map((DocumentSnapshot document) {
-            return  Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 16.0, 8.0, 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        new Container(
+                                          height: 40.0,
+                                          width: 40.0,
+                                          decoration: new BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: new DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: new NetworkImage(
+                                                    "https://pbs.twimg.com/profile_images/916384996092448768/PF1TSFOE_400x400.jpg")),
+                                          ),
+                                        ),
+                                        new SizedBox(
+                                          width: 10.0,
+                                        ),
+                                        new Text(
+                                          "eniola",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    ),
+                                    new Text(
+                                      exp.stringMatch(document['status']) !=
+                                          null ? exp.stringMatch(
+                                          document['status']).toString() : "",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.redAccent),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              document['tweetImage'] != "" ?
+                              Column(
 
-                      Row(
-                        children: <Widget>[
-                          new Container(
-                            height: 40.0,
-                            width: 40.0,
-                            decoration: new BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: new DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: new NetworkImage(
-                                      "https://pbs.twimg.com/profile_images/916384996092448768/PF1TSFOE_400x400.jpg")),
-                            ),
-                          ),
-                          new SizedBox(
-                            width: 10.0,
-                          ),
-                          new Text(
-                            "eniola",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                      new  Text(
-                        exp.stringMatch(document['status'])!= null? exp.stringMatch(document['status']).toString():"",
-                        style: TextStyle(fontWeight: FontWeight.bold,color: Colors.redAccent),
-                      )
-                    ],
+                                children: <Widget>[
+
+
+                                  Hero(
+                                    tag: document['tweetId'],
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  Comment(document: document,)),
+                                        );
+                                      },
+                                      child: FadeInImage.assetNetwork(
+                                          fadeInCurve: Curves.bounceIn,
+height: 250.0,
+                                          width:MediaQuery.of(context).size.width ,
+                                          fit: BoxFit.cover,
+                                          placeholder: 'assets/holder.jpg', image:   document['tweetImage'])
+
+                                    ),
+                                  ),
+                                  Container(
+                                    child: Text(document['status']),
+                                    margin: EdgeInsets.all(14.0),
+                                  )
+                                ],
+                              )
+                                  :
+
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        Comment(document: document,)),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.all(14.0),
+                                  child:
+
+                                  Wrap(
+                                    children: <Widget>[
+                                      Center(child: Text(document['status'],
+                                        style: TextStyle(color: Colors.black,
+                                            fontSize: 18.0),))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment
+                                      .spaceBetween,
+                                  children: <Widget>[
+                                    new Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween,
+                                      children: <Widget>[
+
+                                        StreamBuilder<QuerySnapshot>(
+                                          stream:Firestore.instance.collection('rate').where('rate',isEqualTo: 'upvote').where('postId',isEqualTo:document['tweetId'] ).snapshots(),
+                                          builder: (context,  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                            if (snapshot.hasError) return new Text('${snapshot.error}');
+            switch(snapshot.connectionState) {
+
+            case ConnectionState.waiting:
+                    return new Center(child: new CircularProgressIndicator());
+              default:
+                return GestureDetector(
+                  onTap: () {
+                    vote(document['tweetId'], 'upvote');
+                  },
+                  child: Chip(
+                    avatar: CircleAvatar(
+                      backgroundColor: Colors.green,
+                      child: Text(snapshot.data.documents.length.toString()),
+                    ),
+                    label: new Icon(Icons.arrow_upward),
                   ),
-                ),
-                document['tweetImage'] != ""?
-                Column(
+                );
 
-                  children: <Widget>[
+            }
+
+                                          }
+                                        ),
+                                        new SizedBox(
+                                          width: 6.0,
+                                        ),
+
+                                        StreamBuilder<QuerySnapshot>(
+                                            stream:Firestore.instance.collection('rate').where('rate',isEqualTo: 'downvote').where('postId',isEqualTo:document['tweetId'] ).snapshots(),
+                                            builder: (context,  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                              if (snapshot.hasError) return new Text('${snapshot.error}');
+                                              switch(snapshot.connectionState) {
+
+                                                case ConnectionState.waiting:
+                                                  return new Center(child: new CircularProgressIndicator());
+                                                default:
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      vote(document['tweetId'], 'downvote');
+                                                    },
+                                                    child: Chip(
+                                                      avatar: CircleAvatar(
+                                                        backgroundColor: Colors.red,
+                                                        child: Text(snapshot.data.documents.length.toString()),
+                                                      ),
+                                                      label: new Icon(Icons.arrow_downward),
+                                                    ),
+                                                  );
+
+                                              }
+
+                                            }
+                                        ),
+                                        new SizedBox(
+                                          width: 6.0,
+                                        ),
 
 
-                      Hero(
-                        tag: document['tweetId'],
-                        child: GestureDetector(
-                          onTap: (){
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => Comment(document: document,)),
-                            );
-                          },
-                          child: Image.network(
-                            document['tweetImage'],
+                                      ],
+                                    ),
 
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    Container(
-                        child: Text(document['status']),
-                    margin: EdgeInsets.all(14.0),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Divider(color: Colors.black,)
+                              ),
+
+                            ],
+
+
+                          );
+                        }).toList()
                     )
-                  ],
-                )
-                 :
-
-            GestureDetector(
-                  onTap: (){
-            Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Comment(document: document,)),
-            );
-            },
-              child: Container(
-                margin: EdgeInsets.all(14.0),
-                child:
-
-                Wrap(
-                  children: <Widget>[
-                    Center(child: Text(document['status'],style: TextStyle(color: Colors.black,fontSize: 18.0),))
-                  ],
-                ),
-              ),
-            )    ,
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      new Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-
-                          GestureDetector(
-                            onTap:vote(document['tweetId'],'upvote'),
-                            child: Chip(
-                              avatar: CircleAvatar(
-                                backgroundColor: Colors.green,
-                                child: Text('32'),
-                              ),
-                              label: new Icon(Icons.arrow_upward),
-                            ),
-                          ),
-                          new SizedBox(
-                            width: 6.0,
-                          ),
-
-                          InkWell(
-            onTap:  vote(document['tweetId'],'downvote'),
-                            child: Chip(
-                              avatar: CircleAvatar(
-                                backgroundColor: Colors.red,
-                                child: Text('32'),
-                              ),
-                              label: new Icon(Icons.arrow_downward),
-                            ),
-                          ),
-                          new SizedBox(
-                            width: 6.0,
-                          ),
+                );
+            };
+          },
+        )
 
 
-                        ],
-                      ),
+    );
+  }
 
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Divider(color: Colors.black,)
-                ),
-
-              ],
-
-
-            );
-          }).toList()
-          )
-          );};
-    },
-    )
-
-
-
-
-
-
-
-    );}
-
-    Widget post(snapshot){
+  Widget post(snapshot) {
     return ListView.builder(
-      itemCount:snapshot.data.length,
-      itemBuilder: (context, index) => index == 0
+      itemCount: snapshot.data.length,
+      itemBuilder: (context, index) =>
+      index == 0
           ? new SizedBox(
-        child:Container(),
+        child: Container(),
         //height: deviceSize.height * 0.15,
       )
           : Column(
@@ -223,9 +277,10 @@ final MainService service = new MainService();
                     )
                   ],
                 ),
-                new  Text(
+                new Text(
                   "!isabihiv",
-                  style: TextStyle(fontWeight: FontWeight.bold,color: Colors.redAccent),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Colors.redAccent),
                 )
               ],
             ),
@@ -309,13 +364,11 @@ final MainService service = new MainService();
         ],
       ),
     );
-    }
-
- vote (id,state){
-  service.likeButton(id, state).then((res){
-    print(res);
-  }).catchError((err){
-    print(err);
-  });
   }
+
+  vote(id, state) {
+    service.changeSchool(id, state);
+
+  }
+
 }

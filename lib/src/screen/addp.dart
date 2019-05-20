@@ -20,6 +20,7 @@ class _AddPostState extends State<AddPost> with ValidateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding:false,
       key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -87,7 +88,7 @@ class _AddPostState extends State<AddPost> with ValidateMixin {
 
   Widget emailField() {
     return TextFormField(
-      maxLines: 7,
+      maxLines: 3,
       decoration: InputDecoration(
         labelText: 'Challenge',
         hintText: 'Start a challenge',

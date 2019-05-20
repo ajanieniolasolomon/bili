@@ -29,6 +29,7 @@ Future<dynamic> doesNameAlreadyExist(String name) async {
 Future<Null>addPost(String status,String tweetId) async
 
  {
+   RegExp exp = new RegExp(r"(^|\s)#(\w+)");
 
    var data = {
      'status':status,
@@ -40,6 +41,7 @@ Future<Null>addPost(String status,String tweetId) async
      'likeCount':0,
      'retweetCount':0,
      'postedOn':DateTime.now(),
+     'tag':   exp.stringMatch(status).toString()
 
 
 
@@ -95,29 +97,77 @@ Future<Null>addPost(String status,String tweetId) async
 
    }
  }
-  Future<Null> likeButton(postID,rate) async {
-
- final result = await  Firestore.instance.collection('rate').where('postId', isEqualTo:postID).where('commentBy',isEqualTo:'0908765643' ).snapshots();
 
 
-result.listen((data) async{
-if(data.documents.length ==1){
+  vote(postID,rate) async{
 
-Firestore.instance.collection('rate').document(data.documents[0]['voteId']).updateData({
-    "rate":rate
+
+    final result = await  Firestore.instance.collection('rate').where('postId', isEqualTo:postID).where('commentBy',isEqualTo:'0908765643' ).snapshots();
+try{
+
+  result.forEach((t){
+
+   if(t.documents.length==0){
+     print('empty');
+   }else{
+     print(t.documents[0]['rate']);
+     //update(t.documents[0]['voteId'],rate);
+   }
+
+
+
+
   });
 
+}catch(err){
+  print( err);
 }
-else{
-  var data = {
-    'voteId': '',
-    'postId': postID,
-    'commentBy': '0908765643',
 
-    'rate': rate,
+  }
+
+  update(id,status) async {
+
+   await Firestore.instance.collection('rate')
+        .document(id)
+        .updateData(
+        {
+          'rate': status
+        }
+    );
+  }
 
 
-  };
+  Future<void> changeSchool(postID,rates) async {
+
+    var data = {
+      'voteId': '',
+      'postId': postID,
+      'commentBy': '0908765643',
+      'rate': rates,
+
+
+    };
+    CollectionReference schoolCollection =
+    Firestore.instance.collection('rate');
+
+    CollectionReference studentCollection =
+    Firestore.instance.collection('rate');
+    CollectionReference rate =
+    Firestore.instance.collection('rate');
+
+    QuerySnapshot schoolQuery = await rate
+        .where('postId', isEqualTo:postID)
+        .where('commentBy',isEqualTo:'0908765643' )
+        .getDocuments();
+
+
+
+
+
+
+print(schoolQuery.documents.length);
+
+if(schoolQuery.documents.length==0){
   final result = await  Firestore.instance.collection('rate').add(data);
   try {
     result.get().then((res) {
@@ -135,20 +185,25 @@ else{
 
 
   }
-
+}
+else{
+  final DocumentReference studentRef =
+  studentCollection.document(schoolQuery.documents[0].documentID);
+  Firestore.instance.runTransaction((transaction) async {
+    await transaction.update(studentRef,{
+      "rate":rates
+    });
+  });
 }
 
 
 
-   }
+  }
 
 
 
-);
 
 
-
- }
 
 
 
