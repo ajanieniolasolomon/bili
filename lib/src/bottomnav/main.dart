@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../tabs/trends.dart';
 import '../tabs/hot.dart';
 
-
+import '../tabs/mine.dart';
 class Main extends StatefulWidget {
   @override
   _MainState createState() => _MainState();
@@ -50,7 +50,7 @@ class _MainState extends State<Main> {
             tabs: [
               Tab(child: Text("ALL"),),
               Tab(child: Text("TRENDING",)),
-              Tab(child: Text("FRESH",))
+              Tab(child: Text("MY UPLOAD",))
             ],
           ),
         ),
@@ -59,7 +59,7 @@ class _MainState extends State<Main> {
 
             Trends(),
             Hot(),
-            Hot(),
+            Mine(),
           ],
         ),
       ),
