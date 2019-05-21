@@ -39,6 +39,7 @@ dependencies:
   firebase_core: ^0.4.0
   cloud_firestore: ^0.11.0+1
   fancy_bottom_navigation: ^0.3.2
+  image_picker: ^0.6.0+4
 
 
 

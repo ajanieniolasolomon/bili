@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../screen/comment.dart';
 import '../service/main.dart';
+import 'dart:math';
 class Trends extends StatefulWidget {
   @override
   _TrendsState createState() => _TrendsState();
@@ -10,6 +11,8 @@ class Trends extends StatefulWidget {
 class _TrendsState extends State<Trends> {
   RegExp exp = new RegExp(r"(^|\s)#(\w+)");
   MainService service;
+  var clo = [Colors.redAccent,Colors.green,Colors.blueAccent,Colors.purple,Colors.indigoAccent,Colors.black];
+  final _random = new Random();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   void initState() {
@@ -141,16 +144,17 @@ height: 250.0,
                                     );
                                   },
                                   child: Container(
+                                    color: clo[_random.nextInt(clo.length)],
+                                    height: MediaQuery.of(context).size.height* 0.3,
                                     margin: EdgeInsets.all(14.0),
                                     child:
 
-                                    Wrap(
-                                      children: <Widget>[
-                                        Center(child: Text(document['status'],
-                                          style: TextStyle(color: Colors.black,
-                                              fontSize: 18.0),))
-                                      ],
-                                    ),
+                                    Center(child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Text(document['status'],
+                                        style: TextStyle(color: Colors.white,
+                                            fontSize: 18.0),),
+                                    )),
                                   ),
                                 ),
                                 Padding(
@@ -231,11 +235,7 @@ height: 250.0,
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16.0),
-                                    child: Divider(color: Colors.black,)
-                                ),
+
 
                               ],
 

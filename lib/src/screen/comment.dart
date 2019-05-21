@@ -3,7 +3,7 @@ import '../vmixins/valid_mixins.dart';
 import 'dart:core';
 import '../service/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'dart:math';
 class Comment extends StatefulWidget {
   final document;
 
@@ -23,7 +23,8 @@ class _CommentState extends State<Comment>
   final formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final MainService service = new MainService();
-
+  var clo = [Colors.redAccent,Colors.green,Colors.blueAccent,Colors.purple,Colors.indigoAccent,Colors.yellowAccent];
+  final _random = new Random();
   @override
   void initState() {
     _controller = AnimationController(duration: Duration(milliseconds: 1500), vsync: this);
@@ -54,19 +55,6 @@ class _CommentState extends State<Comment>
 
   @override
   Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: Text("Comment"),
-//        backgroundColor: Colors.redAccent,
-//      ),
-//        body: Container(
-//          child: AnimatedBuilder(
-//      animation: _container,
-//      builder: (BuildContext context, Widget widget) {
-//          return getView();
-//      },
-//    ),
-//        ));
 
     return Scaffold(
         resizeToAvoidBottomPadding:false,
@@ -85,7 +73,7 @@ class _CommentState extends State<Comment>
     ],
     ),
     pinned: true,
-    expandedHeight: MediaQuery.of(context).size.height * 0.4,
+    expandedHeight: MediaQuery.of(context).size.height * 0.3,
     flexibleSpace: FlexibleSpaceBar(
     background: Container(
     child: Container(
@@ -96,7 +84,7 @@ class _CommentState extends State<Comment>
 
     Container(
 
-    height: MediaQuery.of(context).size.height * 0.4,
+    height: MediaQuery.of(context).size.height * 0.3,
     child: Stack(
     children: <Widget>[
     Container(
@@ -110,7 +98,7 @@ class _CommentState extends State<Comment>
     tag: widget.document['tweetId'],
     child:widget.document['tweetImage'] != ""? Image.network(
     widget.document['tweetImage'],
-    height: MediaQuery.of(context).size.height * 0.4,fit: BoxFit.cover,width: MediaQuery.of(context).size.width,
+    height: MediaQuery.of(context).size.height * 0.3,fit: BoxFit.cover,width: MediaQuery.of(context).size.width,
     colorBlendMode: BlendMode.hue,
     color: Colors.transparent,
 
@@ -119,14 +107,14 @@ class _CommentState extends State<Comment>
           gradient: LinearGradient(
               begin: Alignment(gradientPosition.value, 0),
               end: Alignment(-1, 0),
-              colors: [Colors.black12, Colors.black26, Colors.black12]
+              colors: [clo[_random.nextInt(clo.length)], clo[_random.nextInt(clo.length)], clo[_random.nextInt(clo.length)]]
           )
       ),
 
 
     child: Center(child: Padding(
       padding: const EdgeInsets.all(15.0),
-      child: Text(widget.document['status'],style: TextStyle(color: Colors.black26,fontSize: 29.0
+      child: Text(widget.document['status'],style: TextStyle(color: Colors.white,fontSize: 29.0
       ),),
     )),
     ),
@@ -204,7 +192,7 @@ alignment: Alignment.topLeft, child: StreamBuilder<QuerySnapshot>(
     stream: Firestore.instance.collection('comment').where('postId',isEqualTo:widget.document['tweetId'] ).snapshots(),
     builder: (BuildContext context,
     AsyncSnapshot<QuerySnapshot> snapshot) {
-
+      if(snapshot.data == null) return CircularProgressIndicator();
     if (snapshot.hasError) {
 
      return Text('unable to fetch data');
@@ -214,7 +202,7 @@ alignment: Alignment.topLeft, child: StreamBuilder<QuerySnapshot>(
       switch (snapshot.connectionState) {
 
 
-        case ConnectionState.waiting:
+        case ConnectionState.active:
 
           return new Center(child: new CircularProgressIndicator());
 
@@ -223,7 +211,7 @@ alignment: Alignment.topLeft, child: StreamBuilder<QuerySnapshot>(
           return new Column(
               children: snapshot.data.documents
                   .map((DocumentSnapshot document) {
-                print(document.data);
+
                 //  print(DateTime(document.data['commentOn']).toString().split("T")[0]);
                 return     ListTile(
                   title: Text(document.data['commentOn'].toString().split("T")[0]),

@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../vmixins/valid_mixins.dart';
 import '../service/main.dart';
-
+import 'package:image_picker/image_picker.dart';
 class AddPost extends StatefulWidget {
   @override
   _AddPostState createState() => _AddPostState();
@@ -11,7 +13,21 @@ class _AddPostState extends State<AddPost> with ValidateMixin {
   String email = '';
   TextEditingController nameController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  File sampleImage;
 
+  Future getImage(value) async{
+
+    var tempImage = await ImagePicker.pickImage(source:  value == "camera"?ImageSource.camera:ImageSource.gallery);
+  setState(() {
+    sampleImage = tempImage;
+  });
+  }
+  Future getVideo() async{
+    var tempImage = await ImagePicker.pickVideo(source: ImageSource.gallery);
+    setState(() {
+      sampleImage = tempImage;
+    });
+  }
   String _animation = "scan";
   final formKey = GlobalKey<FormState>();
 
@@ -42,10 +58,14 @@ class _AddPostState extends State<AddPost> with ValidateMixin {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       IconButton(
-                          icon: Icon(Icons.camera_roll), onPressed: () {}),
+                          icon: Icon(Icons.camera_roll), onPressed: () {
+                        _settingModalBottomSheet(context);
+
+                      }),
                       _buildSubmit(context),
                     ],
-                  )
+                  ),
+                  sampleImage==null?Container():Image.file(sampleImage,height: MediaQuery.of(context).size.height * 0.3,width: MediaQuery.of(context).size.width ,)
                 ],
               ),
             ),
@@ -104,4 +124,33 @@ class _AddPostState extends State<AddPost> with ValidateMixin {
       },
     );
   }
+  void _settingModalBottomSheet(context){
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc){
+          return Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                    leading: new Icon(Icons.camera,color: Colors.redAccent),
+                    title: new Text('Camera'),
+                    onTap: () => getImage("camera")
+                ),
+                new ListTile(
+                  leading: new Icon(Icons.photo_library,color: Colors.redAccent,),
+                  title: new Text('Gallery'),
+                  onTap: () =>  getImage("library"),
+                ),
+                new ListTile(
+                  leading: new Icon(Icons.video_library,color: Colors.redAccent),
+                  title: new Text('Video'),
+                  onTap: () => getVideo(),
+                ),
+              ],
+            ),
+          );
+        }
+    );
+  }
+
 }

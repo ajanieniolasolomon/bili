@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MainService{
   StreamBuilder _stream;
@@ -203,7 +206,13 @@ else{
 
 
 
-
+  Future<Uri> _pickSaveImage(String imageId) async {
+    File imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+//    StorageReference ref =
+//    FirebaseStorage.instance.ref().child(imageId).child("image.jpg");
+//    StorageUploadTask uploadTask = ref.putFile(imageFile);
+//    return (await uploadTask.future).downloadUrl;
+  }
 
 
 
