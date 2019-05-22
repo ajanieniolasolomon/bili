@@ -61,7 +61,7 @@ class _HotState extends State<Hot> {
                                              children:snapshot.data.documents.map((( documents){
 
                                                if (snapshot.hasError ) return new Text('${snapshot.error}');
-                   
+
 
                                                switch (snapshot.connectionState) {
       case ConnectionState.waiting :

@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class MainService{
   StreamBuilder _stream;
@@ -29,7 +31,7 @@ Future<dynamic> doesNameAlreadyExist(String name) async {
  }
 
 
-Future<Null>addPost(String status,String tweetId) async
+Future<Null>addPost(String status,String tweetId,String img) async
 
  {
    RegExp exp = new RegExp(r"(^|\s)#(\w+)");
@@ -40,7 +42,7 @@ Future<Null>addPost(String status,String tweetId) async
      'tweetBy':'',
      'retweetId':'',
      'retweetBy':'',
-     'tweetImage':'',
+     'tweetImage':img,
      'likeCount':0,
      'retweetCount':0,
      'postedOn':DateTime.now(),
@@ -208,10 +210,12 @@ else{
 
   Future<Uri> _pickSaveImage(String imageId) async {
     File imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
-//    StorageReference ref =
-//    FirebaseStorage.instance.ref().child(imageId).child("image.jpg");
-//    StorageUploadTask uploadTask = ref.putFile(imageFile);
-//    return (await uploadTask.future).downloadUrl;
+    StorageReference ref =
+    FirebaseStorage.instance.ref().child(imageId).child("image.jpg");
+    StorageUploadTask uploadTask = ref.putFile(imageFile);
+    return uploadTask.onComplete.then((res){
+      res.uploadSessionUri.data;
+    });
   }
 
 
