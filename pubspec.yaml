@@ -41,6 +41,7 @@ dependencies:
   fancy_bottom_navigation: ^0.3.2
   image_picker: ^0.6.0+4
   firebase_storage: ^3.0.0
+  provider: ^2.0.1
 
 
 

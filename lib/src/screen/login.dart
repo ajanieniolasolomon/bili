@@ -106,7 +106,7 @@ validator: validateEmail,onSaved: (String value){
   }
 
 check(name,[contexts]){
-  print("re");
+
   return service.doesNameAlreadyExist("0djDBjmj6lrYyQWMElrZ").then((res){
 
     if(res){

@@ -30,6 +30,17 @@ Future<dynamic> doesNameAlreadyExist(String name) async {
    return documents.length == 1;
  }
 
+  Future<dynamic> SignIn(String num) async {
+    final QuerySnapshot result = await Firestore.instance
+        .collection('user')
+        .where('phone_number', isEqualTo: num)
+        .limit(1)
+        .getDocuments();
+    final List<DocumentSnapshot> documents = result.documents;
+
+    return documents.length == 1;
+  }
+
 
 Future<Null>addPost(String status,String tweetId,String img) async
 

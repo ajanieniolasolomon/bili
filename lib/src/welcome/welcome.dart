@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'login.dart';
-
+import '../screen/login.dart';
 class Welcome extends StatefulWidget {
   @override
   _WelcomeState createState() => _WelcomeState();
@@ -95,7 +95,11 @@ color: Colors.black,
                         Text("Register",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
                       ],
                     ),
-                    onPressed:(){},
+                    onPressed:(){
+                      Route route = MaterialPageRoute(builder: (context) => Login());
+
+                      Navigator.push(context, route);
+                    },
                     shape: new RoundedRectangleBorder(
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(10.0),

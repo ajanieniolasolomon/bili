@@ -9,6 +9,7 @@ import 'bloc/provider.dart';
 import 'screen/lunch.dart';
 import 'welcome/welcome.dart';
 import 'screen/home.dart';
+import 'package:provider/provider.dart';
 class App extends StatefulWidget {
 
   @override
@@ -25,14 +26,13 @@ class _AppState extends State<App> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      child: Scaffold(
+    return  Scaffold(
 
 
 body:Welcome(),
 
-    ),
     );
+
 
 
   }
