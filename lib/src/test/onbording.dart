@@ -26,15 +26,21 @@ class _OnboadingState extends State<Onboading> {
           onPageChanged: (index){
             currentPage = index;
             if (currentPage == onboardData.length - 1) {
-              lastPage = true;
+              setState(() {
+                lastPage = true;
+              });
+
 
             } else {
-              lastPage = false;
+              setState(() {
+                lastPage = false;
+              });
+
 
             }
 
           },
-          physics: NeverScrollableScrollPhysics(),
+          //physics: NeverScrollableScrollPhysics(),
           itemCount: onboardData.length,
           itemBuilder: (context, index) {
             return OnboardPage(
@@ -78,8 +84,63 @@ class _OnboadingState extends State<Onboading> {
         lastPage== true?Align(
           alignment: Alignment.bottomLeft,
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 80.0, left: 40),
-            child: Text("FINAL"),
+            padding: const EdgeInsets.only(bottom: 80.0, left: 10),
+            child: Row(
+              children: <Widget>[
+                new SizedBox(
+
+                  width: MediaQuery.of(context).size.width*0.4,
+                  height: 40.0,
+                  child: new RaisedButton(
+                      color: Colors.green,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+
+                          Text("Single line",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
+                        ],
+                      ),
+                      onPressed:(){
+//                      Route route = MaterialPageRoute(builder: (context) => Login());
+//
+//                      Navigator.push(context, route);
+                      },
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              topRight: Radius.circular(70.0),
+                              bottomRight: Radius.circular(70.0)))
+                  ),
+                ),
+SizedBox(width: 10.0,),
+                new SizedBox(
+
+                  width: MediaQuery.of(context).size.width*0.4,
+                  height: 40.0,
+                  child: new RaisedButton(
+                      color: Colors.redAccent,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+
+
+                          Text("Double Line",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
+                        ],
+                      ),
+                      onPressed:(){
+//                      Route route = MaterialPageRoute(builder: (context) => Login());
+//
+//                      Navigator.push(context, route);
+                      },
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10.0),
+                              topRight: Radius.circular(70.0),
+                              bottomRight: Radius.circular(70.0)))
+                  ),
+                ),
+              ],
+            ),
           ),
         ):Align(
           alignment: Alignment.bottomLeft,

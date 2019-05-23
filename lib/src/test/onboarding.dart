@@ -75,7 +75,7 @@ class _OnboardPageState extends State<OnboardPage>
                 },
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                padding: const EdgeInsets.symmetric(horizontal: 28.0),
                 child: Container(
                   height: 250,
                   width: double.infinity,
@@ -99,7 +99,7 @@ class _OnboardPageState extends State<OnboardPage>
                         child: Text(
                           widget.pageModel.subhead,
                           style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 29,
                               fontWeight: FontWeight.bold,
                               color: widget.pageModel.accentColor,
                               letterSpacing: 1,
@@ -111,7 +111,7 @@ class _OnboardPageState extends State<OnboardPage>
                         child: Text(
                           widget.pageModel.description,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 18,
                             color:
                             widget.pageModel.accentColor.withOpacity(0.9),
                           ),
@@ -142,7 +142,7 @@ class _OnboardPageState extends State<OnboardPage>
                       padding: const EdgeInsets.only(bottom: 24.0),
                       child: IconButton(
                         icon: Icon(
-                          Icons.arrow_back,
+                          Icons.arrow_forward,
                           color: widget.pageModel.primeColor,
                           size: 32,
                         ),
