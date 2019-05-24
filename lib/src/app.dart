@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'model/image_model.dart';
-import 'dart:convert';
-import 'dart:async';
-import 'widget/image_list.dart';
-import 'screen/loginn.dart';
-import 'bloc/provider.dart';
-import 'screen/lunch.dart';
+
 import 'welcome/welcome.dart';
-import 'screen/home.dart';
-import 'package:provider/provider.dart';
+import 'map/map.dart';
 class App extends StatefulWidget {
 
   @override
@@ -29,7 +21,7 @@ class _AppState extends State<App> with TickerProviderStateMixin {
     return  Scaffold(
 
 
-body:Welcome(),
+body:Map(),
 
     );
 

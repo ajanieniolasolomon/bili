@@ -5,6 +5,7 @@ import 'onboarding.dart';
 import 'colors.dart';
 import 'package:provider/provider.dart';
 import '../welcome/welcome.dart';
+import '../map/search.dart';
 
 class Onboading extends StatefulWidget {
   @override
@@ -128,9 +129,9 @@ SizedBox(width: 10.0,),
                         ],
                       ),
                       onPressed:(){
-//                      Route route = MaterialPageRoute(builder: (context) => Login());
-//
-//                      Navigator.push(context, route);
+                      Route route = MaterialPageRoute(builder: (context) => Search());
+
+                      Navigator.push(context, route);
                       },
                       shape: new RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
