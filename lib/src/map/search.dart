@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../vmixins/valid_mixins.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import 'map.dart';
+import '../welcome/welcome.dart';
 class Search extends StatefulWidget {
   @override
   _SearchState createState() => _SearchState();
 }
 
 class _SearchState extends State<Search> with ValidateMixin  {
-  String phone_number ='';
+  String location ='';
+
 
 
   final  formKey = GlobalKey<FormState>();
@@ -35,13 +38,13 @@ class _SearchState extends State<Search> with ValidateMixin  {
                 alignment: Alignment.topCenter,
                 child: FlareActor(
 
-                  "assets/try.flr",
-                  animation: "Show",
+                  "assets/map.flr",
+                  animation: "move",
                   fit: BoxFit.cover,
                 ),
               ),
               Container(
-                  margin: EdgeInsets.all(60.0),
+                  margin: EdgeInsets.all(100.0),
 
                   child: Text("Bili",style: TextStyle(color: Colors.redAccent,fontSize: 45,fontWeight: FontWeight.w900),)),
               FractionallySizedBox(
@@ -82,9 +85,9 @@ class _SearchState extends State<Search> with ValidateMixin  {
 
                               child: IconButton(icon: Icon(Icons.home), onPressed: (){
 
-//                                Route route = MaterialPageRoute(builder: (context) => Welcome());
-//
-//                                Navigator.pushReplacement(context, route);
+                                Route route = MaterialPageRoute(builder: (context) => Welcome());
+
+                                Navigator.pushReplacement(context, route);
                               },color: Colors.green,),
                             ),
                             SizedBox(width: 20.0,),
@@ -122,7 +125,7 @@ class _SearchState extends State<Search> with ValidateMixin  {
   Widget _buildLocation(){
     return TextFormField(
       validator: validateEmail,onSaved: (String value){
-      phone_number= value;
+      location= value;
     },
       keyboardType: TextInputType.text,
 
@@ -135,7 +138,7 @@ class _SearchState extends State<Search> with ValidateMixin  {
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xFFe5e5e5),width: 2.0),
           ),
-          suffixIcon: Icon(Icons.phone_android),
+          suffixIcon: Icon(Icons.map),
           hintText: "State"
       ),
     );
@@ -152,6 +155,11 @@ class _SearchState extends State<Search> with ValidateMixin  {
 
         if(formKey.currentState.validate()){
           formKey.currentState.save();
+          Route route = MaterialPageRoute(builder: (context) => Map(location));
+
+                                Navigator.pushReplacement(context, route);
+
+
 //          _scaffoldKey.currentState.showSnackBar(
 //              SnackBar(
 //                backgroundColor: Colors.redAccent,

@@ -5,9 +5,10 @@ import 'onboarding.dart';
 import 'colors.dart';
 import 'package:provider/provider.dart';
 import '../welcome/welcome.dart';
+import '../welcome/login.dart';
 import '../map/search.dart';
-import '../service/main.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../screen/reg.dart';
+import '../screen/login.dart';
 
 class Onboading extends StatefulWidget {
   @override
@@ -18,8 +19,6 @@ class _OnboadingState extends State<Onboading> {
   final PageController pageController = PageController();
   int currentPage = 0;
   bool lastPage = false;
-  SharedPreferences sharedPreferences;
-  MainService service = new MainService();
   @override
   Widget build(BuildContext context) {
     ColorProvider colorProvider = Provider.of<ColorProvider>(context);
@@ -54,37 +53,7 @@ class _OnboadingState extends State<Onboading> {
             );
           },
         ),
-        Container(
-          width: double.infinity,
-          height: 70,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: <Widget>[
-                InkWell(
-                  onTap: (){
-                    Route route = MaterialPageRoute(builder: (context) => Welcome());
 
-                                Navigator.pushReplacement(context, route);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 32.0),
-                    child: Text(
-                      'Home',
-                      style: Theme.of(context).textTheme.title.copyWith(
-                        color: colorProvider.color,
-                      ),
-                    ),
-                  ),
-                ),
-
-              ],
-            ),
-          ),
-        ),
 
         lastPage== true?Align(
           alignment: Alignment.bottomLeft,
@@ -102,13 +71,13 @@ class _OnboadingState extends State<Onboading> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
 
-                          Text("Single line",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
+                          Text("Login",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
                         ],
                       ),
                       onPressed:(){
-//                      Route route = MaterialPageRoute(builder: (context) => Login());
-//
-//                      Navigator.push(context, route);
+                      Route route = MaterialPageRoute(builder: (context) => SignIn());
+
+                      Navigator.push(context, route);
                       },
                       shape: new RoundedRectangleBorder(
                           borderRadius: BorderRadius.only(
@@ -129,16 +98,11 @@ SizedBox(width: 10.0,),
                         children: <Widget>[
 
 
-                          Text("Double Line",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
+                          Text("Register",style: TextStyle(color: Colors.white,fontSize: 15,fontWeight: FontWeight.bold),),
                         ],
                       ),
-                      onPressed:() async {
-
-                      Route route = MaterialPageRoute(builder: (context) => Search());
-                      sharedPreferences = await SharedPreferences.getInstance();
-                      print(sharedPreferences.getString("id").toString());
-
-                      service.updateUsers(sharedPreferences.getString("id").toString(), "positive", sharedPreferences.getString("phone_number").toString());
+                      onPressed:(){
+                      Route route = MaterialPageRoute(builder: (context) => Login());
 
                       Navigator.push(context, route);
                       },

@@ -1,30 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screen/home.dart';
 class Map extends StatefulWidget {
+
+  final String location;
+
+  Map(this.location);
+
   @override
   _MapState createState() => _MapState();
+
+
 }
 
 class _MapState extends State<Map> {
   Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController mapController;
 
-  static const LatLng _center = const LatLng(6.3013753, 7.4596887);
+  final Set<Marker> _markers = {};
+  LatLng  _center = const LatLng(6.514498,  3.3686672);
+
+
 double zoomValue = 5.0;
+
+@override
+void initState() {
+  Find();
+    super.initState();
+  }
+
+  Find(){
+
+
+
+  Firestore.instance.collection("location")..where('search',isEqualTo: widget.location.toLowerCase()).getDocuments().then((docs){
+if(docs.documents.isNotEmpty){
+  for(int i = 0;i<docs.documents.length;i++){
+    setState(() {
+
+      _markers.add(
+          Marker(markerId:MarkerId( docs.documents[i].data['id']), position:LatLng(docs.documents[i].data['lat'],docs.documents[i].data['lon']),
+              infoWindow:InfoWindow(title:docs.documents[i].data['name']),
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)
+          )
+      );
+    });
+
+  }
+}
+
+  });
+
+
+  }
+
+
   void _onMapCreated(GoogleMapController controller) {
-    _controller.complete(controller);
+  _controller.complete(controller);
+
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body:Stack(
-        children: <Widget>[
-          _gooleMap(),
-          _action(),
-          _buildContainer()
-        ],
-      )
+    return  WillPopScope(
+      onWillPop:(){
+        Route route = MaterialPageRoute(builder: (context) =>Home());
+
+        Navigator.push(context, route);
+      } ,
+      child: Scaffold(
+        body:Stack(
+          children: <Widget>[
+            _gooleMap(),
+            _action(),
+            _buildContainer(),
+            close()
+          ],
+        )
+      ),
     );
   }
 
@@ -53,22 +109,45 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       width: MediaQuery.of(context).size.width,
       child: GoogleMap(
         mapType: MapType.normal,
+        myLocationEnabled: true,
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
           target: _center,
           zoom: 12.0,
+
         ),
-        markers: {
-          newYork,newYork2
-        },
+        markers: _markers,
+
       ),
     );
   }
 
-  Widget _boxes(){
+Widget close(){
+  return Positioned(
+      top: 64.0,
+      left: 34.0,
+      child: Container(
+        width: 50.0,
+          height: 50.0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black)
+          ),
+
+          child: IconButton(icon: Icon(Icons.close,color: Colors.black87,size: 32,), onPressed:(){
+            Route route = MaterialPageRoute(builder: (context) =>Home());
+
+            Navigator.push(context, route);
+
+          })));
+}
+
+
+  Widget _boxes(doc){
     return GestureDetector(
       onTap: (){
-        //_gotolocation(lat,lng);
+        _gotoLocation(doc["lat"],doc["lon"]);
       },
       child: Container(
         child: new FittedBox(
@@ -85,13 +164,13 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   height: 200,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(24.0),
-                   // child: Image(image: NetworkImage(""),fit: BoxFit.fill,),
-                    child: Image.asset('assets/illustration.png',),
+                    child: Image(image: NetworkImage(doc["image"]),fit: BoxFit.fill,),
+                   // child: Image.asset('assets/illustration.png',),
                   ),
 
                 ),
                 Container(
-                  child: Padding(padding: EdgeInsets.all(8.0),child: myDetails("hello"),),
+                  child: Padding(padding: EdgeInsets.all(8.0),child: myDetails(doc),),
                 )
               ],
             ),
@@ -102,13 +181,13 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     );
   }
 
-  Widget myDetails(String name){
+  Widget myDetails( name){
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Padding( padding: EdgeInsets.only(left: 8.0),
         child: Container(
-          child: Text("Unth",style: TextStyle(color: Color(0Xff6200ee),fontSize: 24.0,fontWeight: FontWeight.bold
+          child: Text(name['name'],style: TextStyle(color: Color(0Xff6200ee),fontSize: 17.0,fontWeight: FontWeight.bold
 
           ),),
         ),
@@ -119,31 +198,25 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
-              Container(
-                child: Text("2.1",style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 18.0,
-                ),),
-              ),
+
               Container(
                 child: Icon(Icons.star,color: Colors.yellow,size: 15.0,),
               ),Container(
                 child: Icon(Icons.star,color: Colors.yellow,size: 15.0,),
               ),Container(
                 child: Icon(Icons.star,color: Colors.yellow,size: 15.0,),
-              ),
-              Container(
-                child: Text("(789)",style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 18.0,
-                ),),
+              ),Container(
+                child: Icon(Icons.star_half,color: Colors.yellow,size: 15.0,),
+              ),Container(
+                child: Icon(Icons.star_half,color: Colors.yellow,size: 15.0,),
               )
+
             ],
           ),
         ),
         SizedBox(height: 5.0,),
         Container(
-          child: Text("address",style: TextStyle(
+          child: Text(name["address"],style: TextStyle(
             color: Colors.black87,
             fontSize: 18.0
           ),),
@@ -151,13 +224,15 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           
         ),
         SizedBox(height: 5.0,),
+
         Container(
-          child: Text("close",style: TextStyle(
+          child: Text(name["phone"],style: TextStyle(
               color: Colors.black87,
-              fontSize: 18.0,
-            fontWeight: FontWeight.bold
+              fontSize: 18.0
           ),),
-        )
+
+
+        ),
       ],
     );
   }
@@ -168,29 +243,38 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 20.0),
         height: 150.0,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: <Widget>[
-            SizedBox(width: 10.0,),
-            Padding(padding: EdgeInsets.all(8.0),
-            child: _boxes (),),
-            SizedBox(width: 10.0,),
-            Padding(padding: EdgeInsets.all(8.0),
-              child: _boxes (),),
-            SizedBox(width: 10.0,),
-            Padding(padding: EdgeInsets.all(8.0),
-              child: _boxes (),)
-          ],
+        child: StreamBuilder<QuerySnapshot>(
+          stream:Firestore.instance.collection('location').snapshots(),
+          builder: (BuildContext context,
+              AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) return new Text('${snapshot.error}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return new Center(child: new CircularProgressIndicator());
+              default:
+                return ListView(
+                  scrollDirection: Axis.horizontal,
+                    children: snapshot.data.documents
+                        .map((DocumentSnapshot document) {
+                      return  Padding(padding: EdgeInsets.all(8.0),
+                        child: _boxes (document),);
+                    }).toList()
+                );
+
+            }
+
+
+          }
         ),
       ),
     );
   }
 
 
-  Future<void> _gotoLOcation(double lat,double lon) async{
+  Future<void> _gotoLocation(double lat,double lon) async{
      final GoogleMapController controllers = await _controller.future;
      
-     controllers.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(lat, lon),zoom: 15,tilt: 50.0,bearing: 45.0) ));
+     controllers.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(lat, lon),zoom: 15,tilt: 50.0,bearing: 45.0,) ));
 
   }
 
@@ -219,6 +303,9 @@ mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: LatLng(6.3013753, 7.4596887),zoom: zoomValue)));
 
   }
+
+
+
 }
 
 

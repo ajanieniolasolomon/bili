@@ -2,8 +2,9 @@ import "package:flutter/material.dart";
 import 'welcome.dart';
 import '../vmixins/valid_mixins.dart';
 import 'package:flare_flutter/flare_actor.dart';
-
+import  '../screen/home.dart';
 import '../service/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class SignIn extends StatefulWidget {
   @override
   _SignInState createState() => _SignInState();
@@ -11,7 +12,8 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> with ValidateMixin {
   String phone_number ='';
-
+bool loading = false;
+  SharedPreferences sharedPreferences;
   String _animation = "scan";
   final  formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -39,8 +41,8 @@ resizeToAvoidBottomInset: false,
               alignment: Alignment.topCenter,
               child: FlareActor(
 
-                "assets/Sourcerer.flr",
-                animation: "idle",
+                "assets/auth.flr",
+                animation: "auth",
               fit: BoxFit.cover,
               ),
             ),
@@ -104,7 +106,8 @@ resizeToAvoidBottomInset: false,
                       _buildEmail(),
                       SizedBox(height: 20.0,),
                       _submit(),
-
+                      SizedBox(height: 20.0,),
+loading==true?CircularProgressIndicator(backgroundColor: Colors.blue,):Container()
 
 
                     ],
@@ -148,19 +151,36 @@ resizeToAvoidBottomInset: false,
     }
 
     Widget _submit(){
+
+
     return ClipRRect(
               borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(10.0),
                   topRight: Radius.circular(70.0),
                   bottomRight: Radius.circular(70.0)),
-      child: MaterialButton(onPressed:(){
-
+      child: MaterialButton(onPressed:() async{
+        setState(() {
+          loading = true;
+        });
+        sharedPreferences = await SharedPreferences.getInstance();
         if(formKey.currentState.validate()){
           formKey.currentState.save();
 _services.SignIn(phone_number).then((res){
+
   if(res){
-    print(res);
+    setState(() {
+      loading = false;
+      sharedPreferences.setString("phone_number", phone_number);
+
+
+    });
+    Route route = MaterialPageRoute(builder: (context) =>Home());
+
+    Navigator.push(context, route);
   }else{
+    setState(() {
+      loading = false;
+    });
     _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           backgroundColor: Colors.redAccent,
@@ -169,6 +189,9 @@ _services.SignIn(phone_number).then((res){
         ));
   }
 }).catchError((err){
+  setState(() {
+    loading = false;
+  });
   _scaffoldKey.currentState.showSnackBar(
       SnackBar(
         content: Text(err),
@@ -188,14 +211,5 @@ _services.SignIn(phone_number).then((res){
       ),
     );
     }
-  void _showToast(BuildContext context) {
-    final scaffold = Scaffold.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: const Text('Added to favorite'),
-        action: SnackBarAction(
-            label: 'UNDO', onPressed: scaffold.hideCurrentSnackBar),
-      ),
-    );
-  }
+
 }

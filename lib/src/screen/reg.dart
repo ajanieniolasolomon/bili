@@ -3,6 +3,7 @@ import '../vmixins/valid_mixins.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import'../test/main.dart';
 import '../welcome/welcome.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class Reg extends StatefulWidget {
   @override
   _RegState createState() => _RegState();
@@ -11,7 +12,7 @@ class Reg extends StatefulWidget {
 class _RegState extends State<Reg>  with ValidateMixin{
 
   String phone_number ='';
-
+  SharedPreferences sharedPreferences;
   String _animation = "scan";
   final  formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -37,8 +38,8 @@ class _RegState extends State<Reg>  with ValidateMixin{
                 alignment: Alignment.topCenter,
                 child: FlareActor(
 
-                  "assets/TheJack.flr",
-                  animation: "idle",
+                  "assets/call.flr",
+                  animation: "move",
                   fit: BoxFit.cover,
                 ),
               ),
@@ -151,10 +152,14 @@ class _RegState extends State<Reg>  with ValidateMixin{
           topLeft: Radius.circular(10.0),
           topRight: Radius.circular(70.0),
           bottomRight: Radius.circular(70.0)),
-      child: MaterialButton(onPressed:(){
+      child: MaterialButton(onPressed:() async{
 
         if(formKey.currentState.validate()){
           formKey.currentState.save();
+          sharedPreferences = await SharedPreferences.getInstance();
+          setState(() {
+            sharedPreferences.setString("phone_number",  phone_number);
+          });
           Route route = MaterialPageRoute(builder: (context) =>MainTest());
 
           Navigator.pushReplacement(context, route);
@@ -171,7 +176,7 @@ class _RegState extends State<Reg>  with ValidateMixin{
       },
         height: 50.0,
         minWidth: double.infinity,
-        color:Colors.green,
+        color:Colors.redAccent,
         child: Text("Let Test",style: TextStyle(color: Colors.white,fontSize: 20.0),),
       ),
     );

@@ -6,29 +6,30 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
-class MainService{
+import 'package:shared_preferences/shared_preferences.dart';
+class MainService {
   StreamBuilder _stream;
-
- login(String code) async{
-   try{
-     await  Firestore.instance.collection("user").where("barcode",isEqualTo: code).getDocuments();
-   }catch(err){
-     return false;
-   }
-
-
+  SharedPreferences sharedPreferences;
+  login(String code) async {
+    try {
+      await Firestore.instance.collection("user").where(
+          "barcode", isEqualTo: code).getDocuments();
+    } catch (err) {
+      return false;
+    }
   }
-Future<dynamic> doesNameAlreadyExist(String name) async {
-   final QuerySnapshot result = await Firestore.instance
-       .collection('user')
-       .where('barcode', isEqualTo: name)
-       .limit(1)
-       .getDocuments();
-   final List<DocumentSnapshot> documents = result.documents;
 
-   return documents.length == 1;
- }
+  Future<dynamic> doesNameAlreadyExist(String name) async {
+    final QuerySnapshot result = await Firestore.instance
+        .collection('user')
+        .where('barcode', isEqualTo: name)
+        .where("phone_number", isEqualTo: "")
+        .limit(1)
+        .getDocuments();
+    final List<DocumentSnapshot> documents = result.documents;
+
+    return documents.length == 1;
+  }
 
   Future<dynamic> SignIn(String num) async {
     final QuerySnapshot result = await Firestore.instance
@@ -42,108 +43,96 @@ Future<dynamic> doesNameAlreadyExist(String name) async {
   }
 
 
-Future<Null>addPost(String status,String tweetId,String img) async
+  Future<Null> addPost(String status, String tweetId, String img) async
 
- {
-   RegExp exp = new RegExp(r"(^|\s)#(\w+)");
+  {
+    RegExp exp = new RegExp(r"(^|\s)#(\w+)");
 
-   var data = {
-     'status':status,
-     'tweetId':tweetId,
-     'tweetBy':'',
-     'retweetId':'',
-     'retweetBy':'',
-     'tweetImage':img,
-     'likeCount':0,
-     'retweetCount':0,
-     'postedOn':DateTime.now(),
-     'tag':   exp.stringMatch(status).toString()
+    var data = {
+      'status': status,
+      'tweetId': tweetId,
+      'tweetBy': '',
+      'retweetId': '',
+      'retweetBy': '',
+      'tweetImage': img,
+      'likeCount': 0,
+      'retweetCount': 0,
+      'postedOn': DateTime.now(),
+      'tag': exp.stringMatch(status).toString()
+    };
+    final result = await Firestore.instance.collection('post').add(data);
 
+    try {
+      result.get().then((res) {
+        Firestore.instance.collection('post')
+            .document(res.documentID)
+            .updateData(
+            {
+              'tweetId': res.documentID
+            }
+        );
+      }).catchError((err) {
+        print(err);
+      });
+    } catch (err) {
 
-
-   };
-   final  result = await Firestore.instance.collection('post').add(data);
-
-   try{
-     result.get().then((res){
-
-       Firestore.instance.collection('post').document(res.documentID).updateData(
-         {
-           'tweetId':res.documentID
-         }
-       );
-
-
-
-     }).catchError((err){
-       print(err);
-     });
-
-   }catch(err){
-
-   }
-
- }
-
- Future<Null> AddComment(String id, String status) async {
-   var data = {
-     'comment': status,
-     'postId': id,
-     'commentBy': '0908765643',
-     'commentOn':  new DateTime.now().toUtc().toIso8601String(),
-     'commentId': '',
-
-
-   };
-   final result = await Firestore.instance.collection('comment').add(data);
-   try {
-     result.get().then((res) {
-       Firestore.instance.collection('comment')
-           .document(res.documentID)
-           .updateData(
-           {
-             'commentId': res.documentID
-           }
-       );
-     }).catchError((err) {
-       print("error");
-     });
-   } catch (err) {
-
-
-   }
- }
-
-
-  vote(postID,rate) async{
-
-
-    final result = await  Firestore.instance.collection('rate').where('postId', isEqualTo:postID).where('commentBy',isEqualTo:'0908765643' ).snapshots();
-try{
-
-  result.forEach((t){
-
-   if(t.documents.length==0){
-     print('empty');
-   }else{
-     print(t.documents[0]['rate']);
-     //update(t.documents[0]['voteId'],rate);
-   }
-
-
-
-
-  });
-
-}catch(err){
-  print( err);
-}
-
+    }
   }
 
-  update(id,status) async {
+  Future<Null> AddComment(String id, String status) async {
+    sharedPreferences = await SharedPreferences.getInstance();
 
-   await Firestore.instance.collection('rate')
+    var data = {
+      'comment': status,
+      'postId': id,
+      'commentBy': sharedPreferences.getString("phone_number").toString(),
+      'commentOn': new DateTime.now().toUtc().toIso8601String(),
+      'commentId': '',
+
+
+    };
+    final result = await Firestore.instance.collection('comment').add(data);
+    try {
+      result.get().then((res) {
+        Firestore.instance.collection('comment')
+            .document(res.documentID)
+            .updateData(
+            {
+              'commentId': res.documentID
+            }
+        );
+      }).catchError((err) {
+        print("error");
+      });
+    } catch (err) {
+
+
+    }
+  }
+
+
+  vote(postID, rate) async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    final result = await Firestore.instance.collection('rate').where(
+        'postId', isEqualTo: postID)
+        .where('commentBy', isEqualTo: sharedPreferences.getString("phone_number").toString())
+        .snapshots();
+    try {
+      result.forEach((t) {
+        if (t.documents.length == 0) {
+          print('empty');
+        } else {
+          print(t.documents[0]['rate']);
+          //update(t.documents[0]['voteId'],rate);
+        }
+      });
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  update(id, status) async {
+    await Firestore.instance.collection('rate')
         .document(id)
         .updateData(
         {
@@ -153,12 +142,12 @@ try{
   }
 
 
-  Future<void> changeSchool(postID,rates) async {
-
+  Future<void> changeSchool(postID, rates) async {
+    sharedPreferences = await SharedPreferences.getInstance();
     var data = {
       'voteId': '',
       'postId': postID,
-      'commentBy': '0908765643',
+      'commentBy': sharedPreferences.getString("phone_number").toString(),
       'rate': rates,
 
 
@@ -172,51 +161,42 @@ try{
     Firestore.instance.collection('rate');
 
     QuerySnapshot schoolQuery = await rate
-        .where('postId', isEqualTo:postID)
-        .where('commentBy',isEqualTo:'0908765643' )
+        .where('postId', isEqualTo: postID)
+        .where('commentBy', isEqualTo: sharedPreferences.getString("phone_number").toString())
         .getDocuments();
 
 
+    print(schoolQuery.documents.length);
+
+    if (schoolQuery.documents.length == 0) {
+      final result = await Firestore.instance.collection('rate').add(data);
+      try {
+        result.get().then((res) {
+          Firestore.instance.collection('rate')
+              .document(res.documentID)
+              .updateData(
+              {
+                'voteId': res.documentID
+              }
+          );
+        }).catchError((err) {
+
+        });
+      } catch (err) {
 
 
-
-
-print(schoolQuery.documents.length);
-
-if(schoolQuery.documents.length==0){
-  final result = await  Firestore.instance.collection('rate').add(data);
-  try {
-    result.get().then((res) {
-      Firestore.instance.collection('rate')
-          .document(res.documentID)
-          .updateData(
-          {
-            'voteId': res.documentID
-          }
-      );
-    }).catchError((err) {
-
-    });
-  } catch (err) {
-
-
+      }
+    }
+    else {
+      final DocumentReference studentRef =
+      studentCollection.document(schoolQuery.documents[0].documentID);
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.update(studentRef, {
+          "rate": rates
+        });
+      });
+    }
   }
-}
-else{
-  final DocumentReference studentRef =
-  studentCollection.document(schoolQuery.documents[0].documentID);
-  Firestore.instance.runTransaction((transaction) async {
-    await transaction.update(studentRef,{
-      "rate":rates
-    });
-  });
-}
-
-
-
-  }
-
-
 
 
   Future<Uri> _pickSaveImage(String imageId) async {
@@ -224,11 +204,24 @@ else{
     StorageReference ref =
     FirebaseStorage.instance.ref().child(imageId).child("image.jpg");
     StorageUploadTask uploadTask = ref.putFile(imageFile);
-    return uploadTask.onComplete.then((res){
+    return uploadTask.onComplete.then((res) {
       res.uploadSessionUri.data;
     });
   }
 
 
+  updateUsers(id,status,phone) async {
+
+    await Firestore.instance.collection('user')
+        .document(id)
+        .updateData(
+        {
+          'status': status,
+          'phone_number':phone
+        }
+    );
+
+
+  }
 
 }
